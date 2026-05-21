@@ -5,21 +5,31 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-// Простой класс для работы с H2
-// Хранит таблицы в файле exchanger.mv.db в корне проекта
-
+/**
+ * Класс для работы с H2 базой данных
+ * База сохраняется в файл exchanger.mv.db в корне проекта
+ */
 public class Database {
+
+    // === НАСТРОЙКИ ПОДКЛЮЧЕНИЯ ===
     private static final String DB_URL = "jdbc:h2:./exchanger;DB_CLOSE_DELAY=-1";
     private static final String USER = "sa";
-    private static final String PASS = "";
+    private static final String PASS = "";  // пустой пароль для H2
 
-    // Подключение к БД
+    /**
+     * Получить соединение с БД
+     * Закрывать соединение нужно в try-with-resources
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, USER, PASS);
     }
 
-    // Создаем таблицу users при запуске
+    /**
+     * Создаёт таблицы, если их нет
+     * Вызывается 1 раз при старте приложения
+     */
     public static void initTables() {
+        // SQL запрос для создания таблицы пользователей
         String createUserTable = """
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,12 +40,13 @@ public class Database {
             )
         """;
 
+        // try-with-resources — соединение и запрос закроются автоматически
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createUserTable);
-            System.out.println("[DB] Таблица users создана");
+            System.out.println("[DB] Таблица users создана/проверена");
         } catch (SQLException e) {
-            System.err.println("[DB] Ошибка: " + e.getMessage());
+            System.err.println("[DB] Ошибка при создании таблицы: " + e.getMessage());
             e.printStackTrace();
         }
     }
