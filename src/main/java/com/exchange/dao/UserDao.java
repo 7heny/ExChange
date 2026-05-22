@@ -94,6 +94,26 @@ public class UserDao {
         return null;  // пользователь не найден
     }
 
+    // ==================== ПРОВЕРКА СУЩЕСТВОВАНИЯ ====================
+    /**
+     * Проверяет, существует ли пользователь с таким логином
+     * Нужно для регистрации — нельзя создать двух пользователей с одинаковым логином
+     */
+    public boolean userExists(String login) {
+        String sql = "SELECT COUNT(*) FROM users WHERE login = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, login);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;  // если count > 0, значит пользователь есть
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     // ==================== UPDATE ====================
 
     /**
