@@ -59,6 +59,7 @@ public class Database {
                 to_currency VARCHAR(10) NOT NULL,
                 amount DOUBLE NOT NULL,
                 result DOUBLE NOT NULL,
+                amount_rub DOUBLE NOT NULL,
                 operation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
             )
