@@ -43,19 +43,12 @@ public class UserServlet extends HttpServlet {
 
         String path = req.getPathInfo();
 
+        System.out.println("[DEBUG] UserServlet path: " + path);
+
         if (path == null || path.equals("/rates") || path.equals("/")) {
             showRates(req, resp);      // страница с курсами валют
         } else if (path.equals("/profile")) {   // ← ЭТА СТРОЧКА ДОЛЖНА БЫТЬ
             showProfile(req, resp);
-        } else {
-            resp.sendError(404);
-        }
-        if (path == null || path.equals("/rates") || path.equals("/")) {
-            showRates(req, resp);
-        } else if (path.equals("/profile")) {
-            showProfile(req, resp);
-        } else if (path.equals("/exchange")) {        // ← НОВАЯ ВЕТКА
-            showExchange(req, resp);
         } else {
             resp.sendError(404);
         }
