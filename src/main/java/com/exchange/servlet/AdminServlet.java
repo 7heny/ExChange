@@ -36,6 +36,24 @@ public class AdminServlet extends HttpServlet {
             resp.sendRedirect("/auth");
             return;
         }
+        String path = req.getPathInfo();
+
+        if (path == null || path.equals("/dashboard") || path.equals("/")) {
+            showDashboard(req, resp);
+        } else if (path.equals("/users")) {
+            showUsers(req, resp);
+        } else if (path.equals("/currencies")) {
+            showCurrencies(req, resp);
+        } else if (path.equals("/delete")) {
+            deleteUser(req, resp);
+        } else if (path.equals("/deleteCurrency")) {
+            deleteCurrency(req, resp);
+        } else if (path.equals("/editCurrency")) {
+            showEditCurrencyForm(req, resp);
+        } else {
+            resp.sendError(404);
+        }
+    }
 
         // Получаем путь: /admin/dashboard, /admin/users, /admin/delete?id=1
         String path = req.getPathInfo();
