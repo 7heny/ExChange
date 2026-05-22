@@ -354,10 +354,6 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         else if (path.equals("/updateCurrency")) {
             updateCurrency(req, resp);
         }
-        // Добавление пользователя (было в старом doPost)
-        else {
-            addUser(req, resp);
-        }
     }
 
     // ==================== ДОБАВЛЕНИЕ ВАЛЮТЫ ====================
@@ -429,36 +425,5 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         }
         // Возвращаемся на страницу со списком валют
         resp.sendRedirect("/admin/currencies");
-    }
-
-    // ==================== ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ ====================
-    /**
-     * Обрабатывает POST запрос на добавление нового пользователя
-     * Данные приходят из формы на странице /admin/users
-     */
-    private void addUser(HttpServletRequest req, HttpServletResponse resp)
-            throws IOException {
-
-        // Получаем параметры из формы
-        String login = req.getParameter("login");       // логин
-        String password = req.getParameter("password"); // пароль
-        String fullName = req.getParameter("fullName"); // полное имя
-        String role = req.getParameter("role");         // USER или ADMIN
-
-        // Проверяем, что логин не пустой (это обязательное поле)
-        if (login != null && !login.trim().isEmpty()) {
-            User newUser = new User();
-            newUser.setLogin(login.trim());
-            // Если пароль не ввели - ставим значение по умолчанию
-            newUser.setPassword(password != null && !password.isEmpty() ? password : "default123");
-            newUser.setFullName(fullName != null ? fullName : "");
-            newUser.setRole(role != null ? role : "USER");
-
-            // Сохраняем пользователя в БД
-            userDao.addUser(newUser);
-            System.out.println("[ADMIN] Добавлен новый пользователь: " + login);
-        }
-        // Возвращаемся на страницу со списком пользователей
-        resp.sendRedirect("/admin/users");
     }
 }
