@@ -54,6 +54,7 @@ public class Database {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createUserTable);
+            stmt.execute(createCurrencyTable);
             System.out.println("[DB] Таблица users создана/проверена");
         } catch (SQLException e) {
             System.err.println("[DB] Ошибка при создании таблицы: " + e.getMessage());
