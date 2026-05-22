@@ -37,7 +37,7 @@ public class AdminServlet extends HttpServlet {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;");
     }
-
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -162,7 +162,7 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         out.println("<p>Вы вошли как: <b>" + login + "</b> (ADMIN)</p>");
         out.println("<nav>");
         out.println("<a href='/admin/dashboard'>🏕️ Главная</a> | ");
-        out.println("<a href='/admin/users'>🧟‍♂️🧟‍♀️ Пользователи</a> | ");
+        out.println("<a href='/admin/users'>🧟‍♂️ Пользователи</a> | ");
         out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
         out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
         out.println("</nav><br>");
@@ -214,8 +214,8 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         // Заголовок и навигация
         out.println("<h1>💵 Управление валютами</h1>");
         out.println("<nav>");
-        out.println("<a href='/admin/dashboard'>← Назад к главной</a> | ");
-        out.println("<a href='/admin/users'>👥 Пользователи</a> | ");
+        out.println("<a href='/admin/dashboard'>👈 Назад к главной</a> | ");
+        out.println("<a href='/admin/users'>🧟‍♀️ Пользователи</a> | ");
         out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
         out.println("<a href='/auth?logout=1'>Выйти</a>");
         out.println("</nav>");
@@ -286,19 +286,6 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         out.println("<a href='/auth?logout=1'>Выйти</a>");
         out.println("<hr>");
 
-        // Форма добавления нового пользователя
-        out.println("<h2>Добавить пользователя</h2>");
-        out.println("<form method='post' action='/admin/users'>");
-        out.println("Логин: <input type='text' name='login' required>");
-        out.println("Пароль: <input type='password' name='password' required>");
-        out.println("Имя: <input type='text' name='fullName'>");
-        out.println("Роль: <select name='role'>");
-        out.println("<option value='USER'>USER</option>");
-        out.println("<option value='ADMIN'>ADMIN</option>");
-        out.println("</select>");
-        out.println("<button type='submit'>Добавить</button>");
-        out.println("</form><br>");
-
         // Таблица пользователей
         out.println("<h2>Список пользователей</h2>");
         out.println("<table>");
@@ -348,7 +335,7 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
      * - /admin/currencies - добавление новой валюты
      * - /admin/updateCurrency - обновление существующей
      */
-
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
