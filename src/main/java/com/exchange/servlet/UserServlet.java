@@ -1,5 +1,7 @@
 package com.exchange.servlet;
 
+import com.exchange.dao.OperationDao;
+import com.exchange.model.Operation;
 import java.text.DecimalFormat;
 import com.exchange.dao.CurrencyDao;
 import com.exchange.model.Currency;
@@ -125,7 +127,6 @@ public class UserServlet extends HttpServlet {
         String fromCurrency = req.getParameter("fromCurrency");
         String toCurrency = req.getParameter("toCurrency");
 
-        // Проверяем, что все поля заполнены
         if (amountStr == null || fromCurrency == null || toCurrency == null) {
             session.setAttribute("exchangeResult", "❌ Ошибка: все поля обязательны");
             resp.sendRedirect("/user/exchange");
@@ -146,6 +147,19 @@ public class UserServlet extends HttpServlet {
             if (result == null) {
                 session.setAttribute("exchangeResult", "❌ Ошибка: валюта не найдена");
             } else {
+                // Сохраняем операцию в БД
+                User currentUser = (User) session.getAttribute("user");
+                OperationDao opDao = new OperationDao();
+                Operation operation = new Operation(
+                        currentUser.getId(),
+                        currentUser.getLogin(),
+                        fromCurrency,
+                        toCurrency,
+                        amount,
+                        Double.parseDouble(result)
+                );
+                opDao.addOperation(operation);
+
                 session.setAttribute("exchangeResult",
                         "💰 " + amount + " " + fromCurrency.toUpperCase() + " = " + result + " " + toCurrency.toUpperCase());
             }
