@@ -18,7 +18,7 @@ public class OperationDao {
      */
     public void addOperation(Operation operation) {
         String sql = "INSERT INTO operations (user_id, user_login, from_currency, to_currency, amount, result) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, operation.getUserId());
@@ -82,6 +82,7 @@ public class OperationDao {
                 op.setToCurrency(rs.getString("to_currency"));
                 op.setAmount(rs.getDouble("amount"));
                 op.setResult(rs.getDouble("result"));
+                op.setAmountRub(rs.getDouble("amount_rub"));
                 op.setOperationDate(rs.getTimestamp("operation_date"));
                 operations.add(op);
             }
