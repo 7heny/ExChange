@@ -52,7 +52,7 @@ public class AuthServlet extends HttpServlet {
             if ("ADMIN".equals(user.getRole())) {
                 resp.sendRedirect("/admin/dashboard");
             } else {
-                resp.sendRedirect("/");
+                resp.sendRedirect("/user/rates");
             }
         } else {
             resp.sendRedirect("/login.html?error=" + java.net.URLEncoder.encode("Неверный логин или пароль", "UTF-8"));
