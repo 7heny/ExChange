@@ -73,9 +73,10 @@ public class AdminServlet extends HttpServlet {
         out.println("<h1>Админ-панель ExChange</h1>");
         out.println("<p>Вы вошли как: <b>" + login + "</b> (ADMIN)</p>");
         out.println("<nav>");
-        out.println("<a href='/admin/dashboard'>Главная</a> | ");
-        out.println("<a href='/admin/users'>Пользователи</a> | ");
-        out.println("<a href='/auth?logout=1'>Выйти</a>");
+        out.println("<a href='/admin/dashboard'>🏕️ Главная</a> | ");
+        out.println("<a href='/admin/users'>🧟‍♂️🧟‍♀️ Пользователи</a> | ");
+        out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
+        out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
         out.println("</nav><br>");
 
         // Статистика
