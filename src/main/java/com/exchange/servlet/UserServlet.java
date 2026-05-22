@@ -106,4 +106,54 @@ public class UserServlet extends HttpServlet {
 
         out.println("</div></body></html>");
     }
+
+    // ==================== СТРАНИЦА ПРОФИЛЯ ====================
+    /**
+     * Показывает информацию о текущем пользователе
+     */
+    private void showProfile(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        HttpSession session = req.getSession();
+        User user = (User) session.getAttribute("user");
+
+        resp.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>ExChange - Мой профиль</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+        out.println(".container { max-width: 600px; margin: 0 auto; }");
+        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
+        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
+        out.println(".card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+        out.println(".info-row { margin: 15px 0; padding: 10px; border-bottom: 1px solid #eee; }");
+        out.println(".label { font-weight: bold; color: #555; }");
+        out.println("</style>");
+        out.println("</head><body>");
+        out.println("<div class='container'>");
+
+        // Шапка
+        out.println("<div class='header'>");
+        out.println("<h1>🧟‍♂️ Мой профиль</h1>");
+        out.println("<a href='/user/rates'>📊 Курсы</a> | ");
+        out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
+        out.println("</div>");
+
+        // Данные профиля
+        out.println("<div class='card'>");
+        out.println("<h2>Личная информация</h2>");
+        out.println("<div class='info-row'><span class='label'>ID:</span> " + user.getId() + "</div>");
+        out.println("<div class='info-row'><span class='label'>Логин:</span> " + user.getLogin() + "</div>");
+        out.println("<div class='info-row'><span class='label'>Полное имя:</span> " +
+                (user.getFullName() != null && !user.getFullName().isEmpty() ? user.getFullName() : "Не указано") + "</div>");
+        out.println("<div class='info-row'><span class='label'>Роль:</span> " + user.getRole() + "</div>");
+        out.println("</div>");
+
+        out.println("</div></body></html>");
+    }
 }
