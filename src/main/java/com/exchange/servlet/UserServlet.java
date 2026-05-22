@@ -211,43 +211,39 @@ public class UserServlet extends HttpServlet {
         out.println("<html><head>");
         out.println("<meta charset='UTF-8'>");
         out.println("<title>ExChange - Курсы валют</title>");
-        out.println("<style>");
-        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
-        out.println(".container { max-width: 800px; margin: 0 auto; }");
-        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
-        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
-        out.println("table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }");
-        out.println("th { background: #4CAF50; color: white; padding: 12px; }");
-        out.println("td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }");
-        out.println("tr:hover { background: #f1f1f1; }");
-        out.println(".rate { font-weight: bold; color: #2196F3; }");
-        out.println("</style>");
+        out.println("<link rel='stylesheet' href='/css/style.css'>");
         out.println("</head><body>");
         out.println("<div class='container'>");
 
         // Шапка
         out.println("<div class='header'>");
         out.println("<h1>💱 ExChange - Курсы валют</h1>");
-        out.println("<p>👋 Здравствуйте, " + login + "!</p>");
+        out.println("<div class='user-info'>👋 Здравствуйте, " + login + "!</div>");
+        out.println("<nav>");
         out.println("<a href='/user/rates'>📊 Курсы</a> | ");
-        out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/user/profile'>👤 Профиль</a> | ");
         out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
-        out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
+        out.println("<a href='/auth?logout=1'>🚪 Выйти</a>");
+        out.println("</nav>");
         out.println("</div>");
 
         // Таблица курсов
-        out.println("<h2>🪙 Актуальные курсы</h2>");
-        out.println("<table border='1'>");
+        out.println("<div class='card'>");
+        out.println("<h2>💰 Актуальные курсы</h2>");
+        out.println("<div class='table-container'>");
+        out.println("<table>");
         out.println("<tr><th>Код</th><th>Валюта</th><th>Курс (к RUB)</th></tr>");
 
         for (Currency c : currencies) {
             out.println("<tr>");
             out.println("<td><strong>" + c.getCode() + "</strong></td>");
             out.println("<td>" + c.getName() + "</td>");
-            out.println("<td class='rate'>" + c.getRate() + " ₽</td>");
+            out.println("<td>" + c.getRate() + " ₽</td>");
             out.println("</tr>");
         }
         out.println("</table>");
+        out.println("</div>");
+        out.println("</div>");
 
         out.println("</div></body></html>");
     }
@@ -270,27 +266,20 @@ public class UserServlet extends HttpServlet {
         out.println("<html><head>");
         out.println("<meta charset='UTF-8'>");
         out.println("<title>ExChange - Обмен валют</title>");
-        out.println("<style>");
-        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
-        out.println(".container { max-width: 600px; margin: 0 auto; }");
-        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
-        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
-        out.println(".card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
-        out.println("select, input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }");
-        out.println("button { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }");
-        out.println(".result { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center; font-size: 18px; }");
-        out.println("</style>");
+        out.println("<link rel='stylesheet' href='/css/style.css'>");
         out.println("</head><body>");
         out.println("<div class='container'>");
 
         // Шапка
         out.println("<div class='header'>");
         out.println("<h1>💱 Обмен валют</h1>");
-        out.println("<p>👋 Здравствуйте, " + login + "!</p>");
+        out.println("<div class='user-info'>👋 Здравствуйте, " + login + "!</div>");
+        out.println("<nav>");
         out.println("<a href='/user/rates'>📊 Курсы</a> | ");
         out.println("<a href='/user/profile'>👤 Профиль</a> | ");
         out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
         out.println("<a href='/auth?logout=1'>🚪 Выйти</a>");
+        out.println("</nav>");
         out.println("</div>");
 
         // Форма обмена
@@ -298,30 +287,36 @@ public class UserServlet extends HttpServlet {
         out.println("<h2>💰 Конвертер валют</h2>");
         out.println("<form method='post' action='/user/doExchange'>");
 
+        out.println("<div class='form-group'>");
         out.println("<label>💰 Сумма:</label>");
         out.println("<input type='number' name='amount' step='0.01' placeholder='Введите сумму' required>");
+        out.println("</div>");
 
+        out.println("<div class='form-group'>");
         out.println("<label>🔄 Из валюты:</label>");
         out.println("<select name='fromCurrency'>");
         for (Currency c : currencies) {
             out.println("<option value='" + c.getCode() + "'>" + c.getCode() + " - " + c.getName() + "</option>");
         }
         out.println("</select>");
+        out.println("</div>");
 
+        out.println("<div class='form-group'>");
         out.println("<label>🔄 В валюту:</label>");
         out.println("<select name='toCurrency'>");
         for (Currency c : currencies) {
             out.println("<option value='" + c.getCode() + "'>" + c.getCode() + " - " + c.getName() + "</option>");
         }
         out.println("</select>");
+        out.println("</div>");
 
         out.println("<button type='submit'>💱 Рассчитать</button>");
         out.println("</form>");
 
-        // Показываем результат, если он есть в сессии
+        // Показываем результат
         String result = (String) session.getAttribute("exchangeResult");
         if (result != null) {
-            out.println("<div class='result'>✅ " + result + "</div>");
+            out.println("<div class='success-message'>✅ " + result + "</div>");
             session.removeAttribute("exchangeResult");
         }
 
@@ -347,35 +342,30 @@ public class UserServlet extends HttpServlet {
         out.println("<html><head>");
         out.println("<meta charset='UTF-8'>");
         out.println("<title>ExChange - Мой профиль</title>");
-        out.println("<style>");
-        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
-        out.println(".container { max-width: 600px; margin: 0 auto; }");
-        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
-        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
-        out.println(".card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
-        out.println(".info-row { margin: 15px 0; padding: 10px; border-bottom: 1px solid #eee; }");
-        out.println(".label { font-weight: bold; color: #555; }");
-        out.println("</style>");
+        out.println("<link rel='stylesheet' href='/css/style.css'>");
         out.println("</head><body>");
         out.println("<div class='container'>");
 
         // Шапка
         out.println("<div class='header'>");
-        out.println("<h1>🧟‍♂️ Мой профиль</h1>");
+        out.println("<h1>👤 Мой профиль</h1>");
+        out.println("<div class='user-info'>👋 Здравствуйте, " + user.getLogin() + "!</div>");
+        out.println("<nav>");
         out.println("<a href='/user/rates'>📊 Курсы</a> | ");
-        out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/user/profile'>👤 Профиль</a> | ");
         out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
-        out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
+        out.println("<a href='/auth?logout=1'>🚪 Выйти</a>");
+        out.println("</nav>");
         out.println("</div>");
 
         // Данные профиля
         out.println("<div class='card'>");
         out.println("<h2>Личная информация</h2>");
-        out.println("<div class='info-row'><span class='label'>ID:</span> " + user.getId() + "</div>");
-        out.println("<div class='info-row'><span class='label'>Логин:</span> " + user.getLogin() + "</div>");
-        out.println("<div class='info-row'><span class='label'>Полное имя:</span> " +
-                (user.getFullName() != null && !user.getFullName().isEmpty() ? user.getFullName() : "Не указано") + "</div>");
-        out.println("<div class='info-row'><span class='label'>Роль:</span> " + user.getRole() + "</div>");
+        out.println("<div class='form-group'><label>ID:</label> <span>" + user.getId() + "</span></div>");
+        out.println("<div class='form-group'><label>Логин:</label> <span>" + user.getLogin() + "</span></div>");
+        out.println("<div class='form-group'><label>Полное имя:</label> <span>" +
+                (user.getFullName() != null && !user.getFullName().isEmpty() ? user.getFullName() : "Не указано") + "</span></div>");
+        out.println("<div class='form-group'><label>Роль:</label> <span>" + user.getRole() + "</span></div>");
         out.println("</div>");
 
         out.println("</div></body></html>");
