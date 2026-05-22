@@ -98,6 +98,51 @@ public class UserServlet extends HttpServlet {
         return df.format(result);
     }
 
+    // ==================== ОБРАБОТКА ОБМЕНА ====================
+    /**
+     * Обрабатывает POST запрос на обмен валют
+     * Рассчитывает результат и сохраняет в сессию
+     */
+    private void doExchange(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        HttpSession session = req.getSession();
+
+        String amountStr = req.getParameter("amount");
+        String fromCurrency = req.getParameter("fromCurrency");
+        String toCurrency = req.getParameter("toCurrency");
+
+        // Проверяем, что все поля заполнены
+        if (amountStr == null || fromCurrency == null || toCurrency == null) {
+            session.setAttribute("exchangeResult", "❌ Ошибка: все поля обязательны");
+            resp.sendRedirect("/user/exchange");
+            return;
+        }
+
+        try {
+            double amount = Double.parseDouble(amountStr);
+
+            if (amount <= 0) {
+                session.setAttribute("exchangeResult", "❌ Ошибка: сумма должна быть больше 0");
+                resp.sendRedirect("/user/exchange");
+                return;
+            }
+
+            String result = calculateExchange(fromCurrency, toCurrency, amount);
+
+            if (result == null) {
+                session.setAttribute("exchangeResult", "❌ Ошибка: валюта не найдена");
+            } else {
+                session.setAttribute("exchangeResult",
+                        "💰 " + amount + " " + fromCurrency.toUpperCase() + " = " + result + " " + toCurrency.toUpperCase());
+            }
+
+        } catch (NumberFormatException e) {
+            session.setAttribute("exchangeResult", "❌ Ошибка: неверный формат суммы");
+        }
+
+        resp.sendRedirect("/user/exchange");
+    }
     // ==================== СТРАНИЦА С КУРСАМИ ВАЛЮТ ====================
     /**
      * Показывает таблицу со всеми валютами и их курсами
