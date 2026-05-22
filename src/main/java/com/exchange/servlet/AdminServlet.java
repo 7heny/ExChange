@@ -87,6 +87,92 @@ public class AdminServlet extends HttpServlet {
         out.println("</body></html>");
     }
 
+    // ==================== УПРАВЛЕНИЕ ВАЛЮТАМИ ====================
+    /**
+     * Показывает страницу управления валютами
+     * Содержит:
+     *   - форму для добавления новой валюты
+     *   - таблицу со всеми валютами
+     *   - кнопки редактирования и удаления
+     */
+    private void showCurrencies(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        CurrencyDao currencyDao = new CurrencyDao();
+        List<Currency> currencies = currencyDao.getAllCurrencies();
+
+        resp.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>ExChange - Управление валютами</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; margin: 20px; }");
+        out.println("nav { margin: 20px 0; padding: 10px; background: #333; color: white; border-radius: 5px; }");
+        out.println("nav a { margin-right: 20px; color: white; text-decoration: none; }");
+        out.println("table { border-collapse: collapse; width: 100%; margin-top: 20px; }");
+        out.println("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
+        out.println("th { background-color: #2196F3; color: white; }");
+        out.println("tr:nth-child(even) { background-color: #f9f9f9; }");
+        out.println(".edit-btn { color: blue; text-decoration: none; margin-right: 10px; }");
+        out.println(".delete-btn { color: red; text-decoration: none; }");
+        out.println("input, select { padding: 5px; margin: 5px; }");
+        out.println("button { background: #2196F3; color: white; border: none; padding: 6px 12px; cursor: pointer; }");
+        out.println("</style>");
+        out.println("</head><body>");
+
+        // Заголовок и навигация
+        out.println("<h1>💵 Управление валютами</h1>");
+        out.println("<nav>");
+        out.println("<a href='/admin/dashboard'>← Назад к главной</a> | ");
+        out.println("<a href='/admin/users'>👥 Пользователи</a> | ");
+        out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
+        out.println("<a href='/auth?logout=1'>Выйти</a>");
+        out.println("</nav>");
+
+        // ==================== ФОРМА ДОБАВЛЕНИЯ ====================
+        out.println("<h2>➕ Добавить новую валюту</h2>");
+        out.println("<form method='post' action='/admin/currencies'>");
+        out.println("<label>Код:</label>");
+        out.println("<input type='text' name='code' required placeholder='USD' size='5'>");
+        out.println("<label>Название:</label>");
+        out.println("<input type='text' name='name' required placeholder='Доллар США' size='20'>");
+        out.println("<label>Курс:</label>");
+        out.println("<input type='number' name='rate' step='0.01' required placeholder='95.50'>");
+        out.println("<button type='submit'>Добавить валюту</button>");
+        out.println("</form>");
+
+        // ==================== ТАБЛИЦА ВАЛЮТ ====================
+        out.println("<h2>📋 Список валют</h2>");
+        out.println("<table border='1'>");
+        out.println("<tr>");
+        out.println("<th>ID</th>");
+        out.println("<th>Код</th>");
+        out.println("<th>Название</th>");
+        out.println("<th>Курс</th>");
+        out.println("<th>Действия</th>");
+        out.println("</tr>");
+
+        for (Currency c : currencies) {
+            out.println("<tr>");
+            out.println("<td>" + c.getId() + "</td>");
+            out.println("<td>" + escapeHtml(c.getCode()) + "</td>");
+            out.println("<td>" + escapeHtml(c.getName()) + "</td>");
+            out.println("<td>" + c.getRate() + "</td>");
+            out.println("<td>");
+            out.println("<a href='/admin/editCurrency?id=" + c.getId() + "' class='edit-btn'>✏️ Редактировать</a>");
+            out.println("<a href='/admin/deleteCurrency?id=" + c.getId() +
+                    "' onclick='return confirm(\"Удалить валюту " + escapeHtml(c.getCode()) + "?\")' class='delete-btn'>🗑️ Удалить</a>");
+            out.println("</td>");
+            out.println("</tr>");
+        }
+        out.println("</table>");
+
+        out.println("</body></html>");
+    }
+
     // === СПИСОК ПОЛЬЗОВАТЕЛЕЙ (CRUD) ===
     private void showUsers(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
