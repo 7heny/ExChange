@@ -134,7 +134,8 @@ public class UserServlet extends HttpServlet {
         }
 
         try {
-            double amount = Double.parseDouble(amountStr);
+            String normalizedAmount = amountStr.replace(',', '.');
+            double amount = Double.parseDouble(normalizedAmount);
 
             if (amount <= 0) {
                 session.setAttribute("exchangeResult", "❌ Ошибка: сумма должна быть больше 0");
@@ -142,27 +143,49 @@ public class UserServlet extends HttpServlet {
                 return;
             }
 
-            String result = calculateExchange(fromCurrency, toCurrency, amount);
+            String resultStr = calculateExchange(fromCurrency, toCurrency, amount);
 
-            if (result == null) {
+            if (resultStr == null) {
                 session.setAttribute("exchangeResult", "❌ Ошибка: валюта не найдена");
-            } else {
-                // Сохраняем операцию в БД
-                User currentUser = (User) session.getAttribute("user");
-                OperationDao opDao = new OperationDao();
-                Operation operation = new Operation(
-                        currentUser.getId(),
-                        currentUser.getLogin(),
-                        fromCurrency,
-                        toCurrency,
-                        amount,
-                        Double.parseDouble(result)
-                );
-                opDao.addOperation(operation);
-
-                session.setAttribute("exchangeResult",
-                        "💰 " + amount + " " + fromCurrency.toUpperCase() + " = " + result + " " + toCurrency.toUpperCase());
+                resp.sendRedirect("/user/exchange");
+                return;
             }
+
+            double result = Double.parseDouble(resultStr.replace(',', '.'));
+
+            // Рассчитываем сумму в рублях (нормализованная стоимость)
+            List<Currency> currencies = currencyDao.getAllCurrencies();
+            double rubRate = 1.0;
+            for (Currency c : currencies) {
+                if (c.getCode().equals("RUB")) {
+                    rubRate = c.getRate();
+                    break;
+                }
+            }
+            // Сумма в рублях = amount * курс_исходной_валюты
+            double amountInRub = 0;
+            for (Currency c : currencies) {
+                if (c.getCode().equals(fromCurrency)) {
+                    amountInRub = amount * c.getRate();
+                    break;
+                }
+            }
+
+            User currentUser = (User) session.getAttribute("user");
+            OperationDao opDao = new OperationDao();
+            Operation operation = new Operation(
+                    currentUser.getId(),
+                    currentUser.getLogin(),
+                    fromCurrency,
+                    toCurrency,
+                    amount,
+                    result,
+                    amountInRub
+            );
+            opDao.addOperation(operation);
+
+            session.setAttribute("exchangeResult",
+                    "💰 " + amount + " " + fromCurrency.toUpperCase() + " = " + resultStr + " " + toCurrency.toUpperCase());
 
         } catch (NumberFormatException e) {
             session.setAttribute("exchangeResult", "❌ Ошибка: неверный формат суммы");
