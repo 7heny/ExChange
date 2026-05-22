@@ -17,7 +17,7 @@ public class OperationDao {
      * Сохраняет операцию обмена в БД
      */
     public void addOperation(Operation operation) {
-        String sql = "INSERT INTO operations (user_id, user_login, from_currency, to_currency, amount, result) " +
+        String sql = "INSERT INTO operations (user_id, user_login, from_currency, to_currency, amount, result, amount_rub) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
