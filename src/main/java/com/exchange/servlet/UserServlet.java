@@ -46,9 +46,11 @@ public class UserServlet extends HttpServlet {
         System.out.println("[DEBUG] UserServlet path: " + path);
 
         if (path == null || path.equals("/rates") || path.equals("/")) {
-            showRates(req, resp);      // страница с курсами валют
-        } else if (path.equals("/profile")) {   // ← ЭТА СТРОЧКА ДОЛЖНА БЫТЬ
+            showRates(req, resp);
+        } else if (path.equals("/profile")) {
             showProfile(req, resp);
+        } else if (path.equals("/exchange")) {
+            showExchange(req, resp);
         } else {
             resp.sendError(404);
         }
