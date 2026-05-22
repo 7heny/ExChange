@@ -1,5 +1,6 @@
 package com.exchange.servlet;
 
+import java.text.DecimalFormat;
 import com.exchange.dao.CurrencyDao;
 import com.exchange.model.Currency;
 import com.exchange.model.User;
@@ -49,6 +50,43 @@ public class UserServlet extends HttpServlet {
         } else {
             resp.sendError(404);
         }
+    }
+
+    // ==================== РАСЧЁТ ОБМЕНА ВАЛЮТ ====================
+    /**
+     * Рассчитывает обмен из одной валюты в другую
+     * Формула: количество * (курс_исходной / курс_целевой)
+     *
+     * @param fromCode код валюты, из которой меняем (USD, EUR)
+     * @param toCode код валюты, в которую меняем
+     * @param amount количество исходной валюты
+     * @return строка с отформатированным результатом или null при ошибке
+     */
+    private String calculateExchange(String fromCode, String toCode, double amount) {
+        List<Currency> currencies = currencyDao.getAllCurrencies();
+
+        Currency fromCurrency = null;
+        Currency toCurrency = null;
+
+        // Находим валюты по коду
+        for (Currency c : currencies) {
+            if (c.getCode().equalsIgnoreCase(fromCode)) {
+                fromCurrency = c;
+            }
+            if (c.getCode().equalsIgnoreCase(toCode)) {
+                toCurrency = c;
+            }
+        }
+
+        if (fromCurrency == null || toCurrency == null) {
+            return null;
+        }
+
+        // Расчёт: amount * (курс_откуда / курс_куда)
+        double result = amount * (fromCurrency.getRate() / toCurrency.getRate());
+
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(result);
     }
 
     // ==================== СТРАНИЦА С КУРСАМИ ВАЛЮТ ====================
