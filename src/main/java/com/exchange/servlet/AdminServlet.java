@@ -1,5 +1,8 @@
 package com.exchange.servlet;
 
+import com.exchange.dao.OperationDao;
+import com.exchange.model.Operation;
+import java.sql.Timestamp;
 import com.exchange.dao.CurrencyDao;
 import com.exchange.model.Currency;
 import com.exchange.dao.UserDao;
@@ -60,12 +63,95 @@ public class AdminServlet extends HttpServlet {
             deleteCurrency(req, resp);
         } else if (path.equals("/editCurrency")) {
             showEditCurrencyForm(req, resp);
+        } else if (path.equals("/operations")) {
+            showOperations(req, resp);
         } else {
             resp.sendError(404);
         }
     }
 
 
+    // ==================== СТАТИСТИКА ОПЕРАЦИЙ ====================
+    /**
+     * Показывает все операции обмена валют
+     * Доступно только для администратора
+     */
+    private void showOperations(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        OperationDao opDao = new OperationDao();
+        List<Operation> operations = opDao.getAllOperations();
+
+        // Подсчёт статистики
+        double totalAmount = 0;
+        int operationCount = operations.size();
+        for (Operation op : operations) {
+            totalAmount += op.getAmount();
+        }
+
+        resp.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>ExChange - История операций</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+        out.println(".container { max-width: 1200px; margin: 0 auto; }");
+        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
+        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
+        out.println(".stats { display: flex; gap: 20px; margin-bottom: 20px; }");
+        out.println(".stat-card { background: white; padding: 20px; border-radius: 10px; flex: 1; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+        out.println(".stat-number { font-size: 28px; font-weight: bold; color: #2196F3; }");
+        out.println("table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }");
+        out.println("th { background: #2196F3; color: white; padding: 12px; }");
+        out.println("td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }");
+        out.println("tr:hover { background: #f1f1f1; }");
+        out.println("</style>");
+        out.println("</head><body>");
+        out.println("<div class='container'>");
+
+        // Шапка
+        out.println("<div class='header'>");
+        out.println("<h1>📊 История операций</h1>");
+        out.println("<a href='/admin/dashboard'>🏠 Главная</a> | ");
+        out.println("<a href='/admin/users'>👥 Пользователи</a> | ");
+        out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
+        out.println("<a href='/admin/operations'>📊 Операции</a> | ");
+        out.println("<a href='/auth?logout=1'>🚪 Выйти</a>");
+        out.println("</div>");
+
+        // Статистика
+        out.println("<div class='stats'>");
+        out.println("<div class='stat-card'><div class='stat-number'>" + operationCount + "</div><div>Всего операций</div></div>");
+        out.println("<div class='stat-card'><div class='stat-number'>" + String.format("%.2f", totalAmount) + "</div><div>Общий объём (в RUB)</div></div>");
+        out.println("</div>");
+
+        // Таблица операций
+        out.println("<h2>📋 Детали всех операций</h2>");
+        out.println("<table border='1'>");
+        out.println("<tr>");
+        out.println("<th>ID</th>");
+        out.println("<th>Пользователь</th>");
+        out.println("<th>Продал</th>");
+        out.println("<th>Купил</th>");
+        out.println("<th>Дата</th>");
+        out.println("</tr>");
+
+        for (Operation op : operations) {
+            out.println("<tr>");
+            out.println("<td>" + op.getId() + "</td>");
+            out.println("<td>" + escapeHtml(op.getUserLogin()) + "</td>");
+            out.println("<td>" + op.getAmount() + " " + op.getFromCurrency() + "</td>");
+            out.println("<td>" + op.getResult() + " " + op.getToCurrency() + "</td>");
+            out.println("<td>" + op.getOperationDate() + "</td>");
+            out.println("</tr>");
+        }
+        out.println("</table>");
+
+        out.println("</div></body></html>");
+    }
 
 // ==================== УДАЛЕНИЕ ВАЛЮТЫ ====================
 private void deleteCurrency(HttpServletRequest req, HttpServletResponse resp)
