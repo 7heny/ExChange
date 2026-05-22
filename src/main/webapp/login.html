@@ -40,6 +40,17 @@
             color: red;
             text-align: center;
         }
+                .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .login-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -51,8 +62,9 @@
         <button type="submit">Войти</button>
         <div id="errorMsg" class="error"></div>
     </form>
-</div>
-
+    <div class="login-link">
+        Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+    </div>
 <script>
     // Показываем ошибку из URL параметра
     const urlParams = new URLSearchParams(window.location.search);
