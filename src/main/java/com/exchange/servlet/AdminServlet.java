@@ -126,7 +126,7 @@ public class AdminServlet extends HttpServlet {
         // Статистика
         out.println("<div class='stats'>");
         out.println("<div class='stat-card'><div class='stat-number'>" + operationCount + "</div><div>Всего операций</div></div>");
-        out.println("<div class='stat-card'><div class='stat-number'>" + String.format("%.2f", totalAmount) + "</div><div>Общий объём (в RUB)</div></div>");
+        out.println("<div class='stat-card'><div class='stat-number'>" + String.format("%.2f", totalAmountRub) + "</div><div>Общий объём (в RUB)</div></div>");
         out.println("</div>");
 
         // Таблица операций
