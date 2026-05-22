@@ -16,6 +16,7 @@ public class Operation {
     private String toCurrency;     // в какую валюту меняли
     private double amount;         // сколько отдали
     private double result;         // сколько получили
+    private double amountRub;      // сумма в рублях
     private Timestamp operationDate; // дата и время операции
 
     // === КОНСТРУКТОРЫ ===
