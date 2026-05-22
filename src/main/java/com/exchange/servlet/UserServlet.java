@@ -199,6 +199,7 @@ public class UserServlet extends HttpServlet {
         out.println("<p>👋 Здравствуйте, " + login + "!</p>");
         out.println("<a href='/user/rates'>📊 Курсы</a> | ");
         out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
         out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
         out.println("</div>");
 
@@ -331,6 +332,7 @@ public class UserServlet extends HttpServlet {
         out.println("<h1>🧟‍♂️ Мой профиль</h1>");
         out.println("<a href='/user/rates'>📊 Курсы</a> | ");
         out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
         out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
         out.println("</div>");
 
