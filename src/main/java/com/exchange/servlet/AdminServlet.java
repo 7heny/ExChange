@@ -69,6 +69,78 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
+// ==================== УДАЛЕНИЕ ВАЛЮТЫ ====================
+private void deleteCurrency(HttpServletRequest req, HttpServletResponse resp)
+        throws IOException {
+
+    String idStr = req.getParameter("id");
+    if (idStr != null && !idStr.isEmpty()) {
+        try {
+            int id = Integer.parseInt(idStr);
+            CurrencyDao currencyDao = new CurrencyDao();
+            currencyDao.deleteCurrency(id);
+            System.out.println("[ADMIN] Удалена валюта с ID: " + id);
+        } catch (NumberFormatException e) {
+            System.err.println("[ADMIN] Ошибка: ID не число - " + idStr);
+        }
+    }
+    resp.sendRedirect("/admin/currencies");
+}
+
+// ==================== ФОРМА РЕДАКТИРОВАНИЯ ВАЛЮТЫ ====================
+private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse resp)
+        throws IOException {
+
+    String idStr = req.getParameter("id");
+    if (idStr == null || idStr.isEmpty()) {
+        resp.sendRedirect("/admin/currencies");
+        return;
+    }
+
+    try {
+        int id = Integer.parseInt(idStr);
+        CurrencyDao currencyDao = new CurrencyDao();
+        Currency currency = currencyDao.getCurrencyById(id);
+
+        if (currency == null) {
+            resp.sendRedirect("/admin/currencies");
+            return;
+        }
+
+        resp.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>Редактировать валюту</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial; margin: 20px; }");
+        out.println("input { padding: 5px; margin: 5px; }");
+        out.println("button { background: #2196F3; color: white; border: none; padding: 6px 12px; cursor: pointer; }");
+        out.println("</style>");
+        out.println("</head><body>");
+
+        out.println("<h1>✏️ Редактировать валюту</h1>");
+        out.println("<form method='post' action='/admin/updateCurrency'>");
+        out.println("<input type='hidden' name='id' value='" + currency.getId() + "'>");
+        out.println("<label>Код:</label>");
+        out.println("<input type='text' name='code' value='" + escapeHtml(currency.getCode()) + "' required><br>");
+        out.println("<label>Название:</label>");
+        out.println("<input type='text' name='name' value='" + escapeHtml(currency.getName()) + "' required size='30'><br>");
+        out.println("<label>Курс:</label>");
+        out.println("<input type='number' name='rate' step='0.01' value='" + currency.getRate() + "' required><br>");
+        out.println("<button type='submit'>Сохранить</button>");
+        out.println("<a href='/admin/currencies'>Отмена</a>");
+        out.println("</form>");
+
+        out.println("</body></html>");
+
+    } catch (NumberFormatException e) {
+        resp.sendRedirect("/admin/currencies");
+    }
+}
+
     // === ГЛАВНАЯ АДМИНКИ ===
     private void showDashboard(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
