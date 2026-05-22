@@ -32,6 +32,17 @@ public class Operation {
         this.result = result;
     }
 
+    public Operation(int userId, String userLogin, String fromCurrency,
+                     String toCurrency, double amount, double result, double amountRub) {
+        this.userId = userId;
+        this.userLogin = userLogin;
+        this.fromCurrency = fromCurrency;
+        this.toCurrency = toCurrency;
+        this.amount = amount;
+        this.result = result;
+        this.amountRub = amountRub;
+    }
+
     // === ГЕТТЕРЫ И СЕТТЕРЫ ===
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -53,6 +64,9 @@ public class Operation {
 
     public double getResult() { return result; }
     public void setResult(double result) { this.result = result; }
+
+    public double getAmountRub() { return amountRub; }
+    public void setAmountRub(double amountRub) { this.amountRub = amountRub; }
 
     public Timestamp getOperationDate() { return operationDate; }
     public void setOperationDate(Timestamp operationDate) { this.operationDate = operationDate; }
