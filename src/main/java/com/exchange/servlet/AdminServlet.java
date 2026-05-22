@@ -250,6 +250,7 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         out.println("<a href='/admin/dashboard'>🏕️ Главная</a> | ");
         out.println("<a href='/admin/users'>🧟‍♂️ Пользователи</a> | ");
         out.println("<a href='/admin/currencies'>💵 Валюты</a> | ");
+        out.println("<a href='/admin/operations'>📊 Операции</a> | ");
         out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
         out.println("</nav><br>");
 
