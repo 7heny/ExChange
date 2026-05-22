@@ -1,5 +1,7 @@
 package com.exchange.servlet;
 
+import com.exchange.dao.CurrencyDao;
+import com.exchange.model.Currency;
 import com.exchange.dao.UserDao;
 import com.exchange.model.User;
 import javax.servlet.ServletException;
@@ -27,7 +29,15 @@ public class AdminServlet extends HttpServlet {
         return "ADMIN".equals(role);
     }
 
-    @Override
+    // === ЗАЩИТА ОТ XSS ===
+    private String escapeHtml(String text) {
+        if (text == null) return "";
+        return text.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;");
+    }
+
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
@@ -55,19 +65,7 @@ public class AdminServlet extends HttpServlet {
         }
     }
 
-        // Получаем путь: /admin/dashboard, /admin/users, /admin/delete?id=1
-        String path = req.getPathInfo();
 
-        if (path == null || path.equals("/dashboard") || path.equals("/")) {
-            showDashboard(req, resp);
-        } else if (path.equals("/users")) {
-            showUsers(req, resp);
-        } else if (path.equals("/delete")) {
-            deleteUser(req, resp);
-        } else {
-            resp.sendError(404);
-        }
-    }
 
 // ==================== УДАЛЕНИЕ ВАЛЮТЫ ====================
 private void deleteCurrency(HttpServletRequest req, HttpServletResponse resp)
@@ -343,29 +341,137 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
     }
 
     // === ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ (POST) ===
-    @Override
+    // ==================== POST-ЗАПРОСЫ ДЛЯ ВАЛЮТ ====================
+
+    /**
+     * Обрабатывает POST запросы:
+     * - /admin/currencies - добавление новой валюты
+     * - /admin/updateCurrency - обновление существующей
+     */
+
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws IOException {
 
         if (!isAdmin(req)) {
             resp.sendRedirect("/auth");
             return;
         }
 
-        String login = req.getParameter("login");
-        String password = req.getParameter("password");
-        String fullName = req.getParameter("fullName");
-        String role = req.getParameter("role");
+        String path = req.getPathInfo();
 
-        if (login != null && password != null && !login.isEmpty()) {
+        // Добавление новой валюты
+        if (path == null || path.equals("/currencies")) {
+            addCurrency(req, resp);
+        }
+        // Обновление валюты
+        else if (path.equals("/updateCurrency")) {
+            updateCurrency(req, resp);
+        }
+        // Добавление пользователя (было в старом doPost)
+        else {
+            addUser(req, resp);
+        }
+    }
+
+    // ==================== ДОБАВЛЕНИЕ ВАЛЮТЫ ====================
+    /**
+     * Обрабатывает POST запрос на добавление новой валюты
+     * Данные приходят из формы на странице /admin/currencies
+     */
+    private void addCurrency(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        // Получаем параметры из формы
+        String code = req.getParameter("code");      // код валюты (USD, EUR)
+        String name = req.getParameter("name");      // название (Доллар США)
+        String rateStr = req.getParameter("rate");   // курс (строкой, т.к. из формы)
+
+        // Проверяем, что все поля заполнены
+        if (code != null && name != null && rateStr != null && !code.isEmpty()) {
+            try {
+                // Преобразуем строку с курсом в число
+                double rate = Double.parseDouble(rateStr);
+
+                // Создаём объект валюты и сохраняем в БД
+                Currency currency = new Currency(code.toUpperCase(), name, rate);
+                CurrencyDao currencyDao = new CurrencyDao();
+                currencyDao.addCurrency(currency);
+
+                System.out.println("[ADMIN] Добавлена валюта: " + code);
+            } catch (NumberFormatException e) {
+                // Если курс ввели буквами или с ошибкой
+                System.err.println("[ADMIN] Ошибка: неверный формат курса - " + rateStr);
+            }
+        }
+        // Возвращаемся на страницу со списком валют
+        resp.sendRedirect("/admin/currencies");
+    }
+
+    // ==================== ОБНОВЛЕНИЕ ВАЛЮТЫ ====================
+    /**
+     * Обрабатывает POST запрос на обновление существующей валюты
+     * Данные приходят из формы редактирования
+     */
+    private void updateCurrency(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        // Получаем параметры из формы
+        String idStr = req.getParameter("id");       // ID валюты (скрытое поле)
+        String code = req.getParameter("code");      // новый код
+        String name = req.getParameter("name");      // новое название
+        String rateStr = req.getParameter("rate");   // новый курс
+
+        // Проверяем, что все поля есть
+        if (idStr != null && code != null && name != null && rateStr != null) {
+            try {
+                // Преобразуем ID и курс в числа
+                int id = Integer.parseInt(idStr);
+                double rate = Double.parseDouble(rateStr);
+
+                // Создаём объект с новыми данными и сохраняем
+                Currency currency = new Currency(code.toUpperCase(), name, rate);
+                currency.setId(id);   // ID важен, чтобы понять КАКУЮ валюту обновлять
+
+                CurrencyDao currencyDao = new CurrencyDao();
+                currencyDao.updateCurrency(currency);
+
+                System.out.println("[ADMIN] Обновлена валюта ID: " + id);
+            } catch (NumberFormatException e) {
+                System.err.println("[ADMIN] Ошибка при обновлении валюты");
+            }
+        }
+        // Возвращаемся на страницу со списком валют
+        resp.sendRedirect("/admin/currencies");
+    }
+
+    // ==================== ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ ====================
+    /**
+     * Обрабатывает POST запрос на добавление нового пользователя
+     * Данные приходят из формы на странице /admin/users
+     */
+    private void addUser(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        // Получаем параметры из формы
+        String login = req.getParameter("login");       // логин
+        String password = req.getParameter("password"); // пароль
+        String fullName = req.getParameter("fullName"); // полное имя
+        String role = req.getParameter("role");         // USER или ADMIN
+
+        // Проверяем, что логин не пустой (это обязательное поле)
+        if (login != null && !login.trim().isEmpty()) {
             User newUser = new User();
-            newUser.setLogin(login);
-            newUser.setPassword(password);
+            newUser.setLogin(login.trim());
+            // Если пароль не ввели - ставим значение по умолчанию
+            newUser.setPassword(password != null && !password.isEmpty() ? password : "default123");
             newUser.setFullName(fullName != null ? fullName : "");
             newUser.setRole(role != null ? role : "USER");
-            userDao.addUser(newUser);
-        }
 
+            // Сохраняем пользователя в БД
+            userDao.addUser(newUser);
+            System.out.println("[ADMIN] Добавлен новый пользователь: " + login);
+        }
+        // Возвращаемся на страницу со списком пользователей
         resp.sendRedirect("/admin/users");
     }
 }
