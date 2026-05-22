@@ -50,6 +50,15 @@ public class UserServlet extends HttpServlet {
         } else {
             resp.sendError(404);
         }
+        if (path == null || path.equals("/rates") || path.equals("/")) {
+            showRates(req, resp);
+        } else if (path.equals("/profile")) {
+            showProfile(req, resp);
+        } else if (path.equals("/exchange")) {        // ← НОВАЯ ВЕТКА
+            showExchange(req, resp);
+        } else {
+            resp.sendError(404);
+        }
     }
 
     // ==================== РАСЧЁТ ОБМЕНА ВАЛЮТ ====================
