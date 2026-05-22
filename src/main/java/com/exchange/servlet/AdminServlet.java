@@ -262,6 +262,7 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
     }
 
     // === СПИСОК ПОЛЬЗОВАТЕЛЕЙ (CRUD) ===
+    // === СПИСОК ПОЛЬЗОВАТЕЛЕЙ ===
     private void showUsers(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
@@ -278,27 +279,38 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         out.println("th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }");
         out.println("th { background-color: #4CAF50; color: white; }");
         out.println(".delete-btn { color: red; text-decoration: none; }");
-        out.println(".add-btn { background: green; color: white; padding: 5px 10px; text-decoration: none; }");
         out.println("</style></head><body>");
 
-        out.println("<h1>Управление пользователями</h1>");
+        // Заголовок и навигация
+        out.println("<h1>👥 Управление пользователями</h1>");
         out.println("<a href='/admin/dashboard'>Назад</a> | ");
         out.println("<a href='/auth?logout=1'>Выйти</a>");
         out.println("<hr>");
 
+        // Форма добавления нового АДМИНА
+        out.println("<h2>➕ Создать нового администратора</h2>");
+        out.println("<p style='color: #666; font-size: 14px;'>Только для создания учётных записей администраторов</p>");
+        out.println("<form method='post' action='/admin/addAdmin'>");
+        out.println("Логин: <input type='text' name='login' required>");
+        out.println("Пароль: <input type='password' name='password' required>");
+        out.println("Имя: <input type='text' name='fullName'>");
+        out.println("<button type='submit' style='background: #ff9800;'>➕ Создать администратора</button>");
+        out.println("</form><br>");
+        out.println("<hr>");
+
         // Таблица пользователей
-        out.println("<h2>Список пользователей</h2>");
+        out.println("<h2>📋 Список пользователей</h2>");
         out.println("<table>");
         out.println("<tr><th>ID</th><th>Логин</th><th>Имя</th><th>Роль</th><th>Действия</th></tr>");
 
         for (User u : users) {
             out.println("<tr>");
             out.println("<td>" + u.getId() + "</td>");
-            out.println("<td>" + u.getLogin() + "</td>");
-            out.println("<td>" + (u.getFullName() != null ? u.getFullName() : "") + "</td>");
+            out.println("<td>" + escapeHtml(u.getLogin()) + "</td>");
+            out.println("<td>" + (u.getFullName() != null ? escapeHtml(u.getFullName()) : "") + "</td>");
             out.println("<td>" + u.getRole() + "</td>");
             out.println("<td>");
-            out.println("<a href='/admin/delete?id=" + u.getId() + "' onclick='return confirm(\"Удалить?\")' class='delete-btn'>Удалить</a>");
+            out.println("<a href='/admin/delete?id=" + u.getId() + "' onclick='return confirm(\"Удалить?\")' class='delete-btn'>🗑️ Удалить</a>");
             out.println("</td>");
             out.println("</tr>");
         }
@@ -326,7 +338,32 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         }
         resp.sendRedirect("/admin/users");
     }
+// ==================== ДОБАВЛЕНИЕ АДМИНА ====================
+    /**
+     * Создаёт нового администратора (только для существующих админов)
+     */
+    private void addAdmin(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
 
+        String login = req.getParameter("login");
+        String password = req.getParameter("password");
+        String fullName = req.getParameter("fullName");
+
+        if (login != null && !login.trim().isEmpty()) {
+            if (userDao.userExists(login)) {
+                System.out.println("[ADMIN] Ошибка: пользователь " + login + " уже существует");
+            } else {
+                User newAdmin = new User();
+                newAdmin.setLogin(login.trim());
+                newAdmin.setPassword(password != null && !password.isEmpty() ? password : "admin123");
+                newAdmin.setFullName(fullName != null ? fullName : "");
+                newAdmin.setRole("ADMIN");  // ← роль ADMIN
+                userDao.addUser(newAdmin);
+                System.out.println("[ADMIN] Создан новый администратор: " + login);
+            }
+        }
+        resp.sendRedirect("/admin/users");
+    }
     // === ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ (POST) ===
     // ==================== POST-ЗАПРОСЫ ДЛЯ ВАЛЮТ ====================
 
@@ -353,6 +390,10 @@ private void showEditCurrencyForm(HttpServletRequest req, HttpServletResponse re
         // Обновление валюты
         else if (path.equals("/updateCurrency")) {
             updateCurrency(req, resp);
+        }
+        // Добавление нового админа
+        else if (path.equals("/addAdmin")) {
+            addAdmin(req, resp);
         }
     }
 
