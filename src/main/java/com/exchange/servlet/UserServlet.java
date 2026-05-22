@@ -42,10 +42,68 @@ public class UserServlet extends HttpServlet {
 
         String path = req.getPathInfo();
 
-        // Пока только заглушка
+        if (path == null || path.equals("/rates") || path.equals("/")) {
+            showRates(req, resp);      // страница с курсами валют
+        } else {
+            resp.sendError(404);
+        }
+    }
+
+    // ==================== СТРАНИЦА С КУРСАМИ ВАЛЮТ ====================
+    /**
+     * Показывает таблицу со всеми валютами и их курсами
+     */
+    private void showRates(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        HttpSession session = req.getSession();
+        String login = (String) session.getAttribute("login");
+        List<Currency> currencies = currencyDao.getAllCurrencies();
+
         resp.setContentType("text/html; charset=UTF-8");
-        resp.getWriter().println("<h1>User panel works!</h1>");
-        resp.getWriter().println("<p>Path: " + path + "</p>");
-        resp.getWriter().println("<a href='/auth?logout=1'>Выйти</a>");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>ExChange - Курсы валют</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+        out.println(".container { max-width: 800px; margin: 0 auto; }");
+        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
+        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
+        out.println("table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }");
+        out.println("th { background: #4CAF50; color: white; padding: 12px; }");
+        out.println("td { padding: 10px; border-bottom: 1px solid #ddd; text-align: center; }");
+        out.println("tr:hover { background: #f1f1f1; }");
+        out.println(".rate { font-weight: bold; color: #2196F3; }");
+        out.println("</style>");
+        out.println("</head><body>");
+        out.println("<div class='container'>");
+
+        // Шапка
+        out.println("<div class='header'>");
+        out.println("<h1>💱 ExChange - Курсы валют</h1>");
+        out.println("<p>👋 Здравствуйте, " + login + "!</p>");
+        out.println("<a href='/user/rates'>📊 Курсы</a> | ");
+        out.println("<a href='/user/profile'>🧟‍♂️ Профиль</a> | ");
+        out.println("<a href='/auth?logout=1'>👇 Выйти</a>");
+        out.println("</div>");
+
+        // Таблица курсов
+        out.println("<h2>🪙 Актуальные курсы</h2>");
+        out.println("<table border='1'>");
+        out.println("<tr><th>Код</th><th>Валюта</th><th>Курс (к RUB)</th></tr>");
+
+        for (Currency c : currencies) {
+            out.println("<tr>");
+            out.println("<td><strong>" + c.getCode() + "</strong></td>");
+            out.println("<td>" + c.getName() + "</td>");
+            out.println("<td class='rate'>" + c.getRate() + " ₽</td>");
+            out.println("</tr>");
+        }
+        out.println("</table>");
+
+        out.println("</div></body></html>");
     }
 }
