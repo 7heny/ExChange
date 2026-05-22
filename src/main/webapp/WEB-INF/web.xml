@@ -7,15 +7,24 @@
 
     <display-name>ExChange</display-name>
 
-    <!-- Регистрация сервлета авторизации -->
+    <!-- Сервлет авторизации -->
     <servlet>
         <servlet-name>AuthServlet</servlet-name>
         <servlet-class>com.exchange.servlet.AuthServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>AuthServlet</servlet-name>
         <url-pattern>/auth</url-pattern>
+    </servlet-mapping>
+
+    <!-- Админ-сервлет -->
+    <servlet>
+        <servlet-name>AdminServlet</servlet-name>
+        <servlet-class>com.exchange.servlet.AdminServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdminServlet</servlet-name>
+        <url-pattern>/admin/*</url-pattern>
     </servlet-mapping>
 
 </web-app>
