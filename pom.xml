@@ -36,19 +36,18 @@
             <version>${jetty.version}</version>
         </dependency>
 
+        <!-- JSP поддержка (нужна для работы сервлетов) -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>apache-jsp</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+
         <!-- H2 Database -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>2.2.224</version>
-        </dependency>
-
-        <!-- Servlet API для работы с сервлетами и сессиями -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
