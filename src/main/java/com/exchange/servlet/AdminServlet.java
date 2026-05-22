@@ -82,11 +82,12 @@ public class AdminServlet extends HttpServlet {
         OperationDao opDao = new OperationDao();
         List<Operation> operations = opDao.getAllOperations();
 
-        // Подсчёт статистики
-        double totalAmount = 0;
+        // Подсчёт общей суммы в рублях (используем готовое поле amountRub)
+        double totalAmountRub = 0;
         int operationCount = operations.size();
+
         for (Operation op : operations) {
-            totalAmount += op.getAmount();
+            totalAmountRub += op.getAmountRub();
         }
 
         resp.setContentType("text/html; charset=UTF-8");
