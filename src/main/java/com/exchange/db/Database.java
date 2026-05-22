@@ -40,6 +40,16 @@ public class Database {
             )
         """;
 
+        // ========== НОВАЯ ТАБЛИЦА ДЛЯ ВАЛЮТ ==========
+        String createCurrencyTable = """
+            CREATE TABLE IF NOT EXISTS currencies (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                code VARCHAR(10) UNIQUE NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                rate DOUBLE NOT NULL
+            )
+        """;
+
         // try-with-resources — соединение и запрос закроются автоматически
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
