@@ -61,6 +61,24 @@ public class UserServlet extends HttpServlet {
         }
     }
 
+    // ==================== POST-ЗАПРОСЫ ====================
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        if (!isLoggedIn(req)) {
+            resp.sendRedirect("/auth");
+            return;
+        }
+
+        String path = req.getPathInfo();
+
+        if (path.equals("/doExchange")) {
+            doExchange(req, resp);
+        } else {
+            resp.sendError(404);
+        }
+    }
     // ==================== РАСЧЁТ ОБМЕНА ВАЛЮТ ====================
     /**
      * Рассчитывает обмен из одной валюты в другую
