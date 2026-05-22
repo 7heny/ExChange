@@ -147,6 +147,84 @@ public class UserServlet extends HttpServlet {
         out.println("</div></body></html>");
     }
 
+    // ==================== СТРАНИЦА ОБМЕНА ВАЛЮТ ====================
+    /**
+     * Показывает форму для обмена валют
+     */
+    private void showExchange(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        HttpSession session = req.getSession();
+        String login = (String) session.getAttribute("login");
+        List<Currency> currencies = currencyDao.getAllCurrencies();
+
+        resp.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<title>ExChange - Обмен валют</title>");
+        out.println("<style>");
+        out.println("body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }");
+        out.println(".container { max-width: 600px; margin: 0 auto; }");
+        out.println(".header { background: #333; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }");
+        out.println(".header a { color: white; text-decoration: none; margin-left: 20px; }");
+        out.println(".card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+        out.println("select, input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }");
+        out.println("button { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }");
+        out.println(".result { background: #e8f5e9; padding: 15px; border-radius: 5px; margin-top: 20px; text-align: center; font-size: 18px; }");
+        out.println("</style>");
+        out.println("</head><body>");
+        out.println("<div class='container'>");
+
+        // Шапка
+        out.println("<div class='header'>");
+        out.println("<h1>💱 Обмен валют</h1>");
+        out.println("<p>👋 Здравствуйте, " + login + "!</p>");
+        out.println("<a href='/user/rates'>📊 Курсы</a> | ");
+        out.println("<a href='/user/profile'>👤 Профиль</a> | ");
+        out.println("<a href='/user/exchange'>💱 Обмен</a> | ");
+        out.println("<a href='/auth?logout=1'>🚪 Выйти</a>");
+        out.println("</div>");
+
+        // Форма обмена
+        out.println("<div class='card'>");
+        out.println("<h2>💰 Конвертер валют</h2>");
+        out.println("<form method='post' action='/user/doExchange'>");
+
+        out.println("<label>💰 Сумма:</label>");
+        out.println("<input type='number' name='amount' step='0.01' placeholder='Введите сумму' required>");
+
+        out.println("<label>🔄 Из валюты:</label>");
+        out.println("<select name='fromCurrency'>");
+        for (Currency c : currencies) {
+            out.println("<option value='" + c.getCode() + "'>" + c.getCode() + " - " + c.getName() + "</option>");
+        }
+        out.println("</select>");
+
+        out.println("<label>🔄 В валюту:</label>");
+        out.println("<select name='toCurrency'>");
+        for (Currency c : currencies) {
+            out.println("<option value='" + c.getCode() + "'>" + c.getCode() + " - " + c.getName() + "</option>");
+        }
+        out.println("</select>");
+
+        out.println("<button type='submit'>💱 Рассчитать</button>");
+        out.println("</form>");
+
+        // Показываем результат, если он есть в сессии
+        String result = (String) session.getAttribute("exchangeResult");
+        if (result != null) {
+            out.println("<div class='result'>✅ " + result + "</div>");
+            session.removeAttribute("exchangeResult");
+        }
+
+        out.println("</div>");
+        out.println("</div></body></html>");
+    }
+
+
     // ==================== СТРАНИЦА ПРОФИЛЯ ====================
     /**
      * Показывает информацию о текущем пользователе
