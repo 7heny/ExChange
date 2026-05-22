@@ -40,7 +40,7 @@ public class Database {
             )
         """;
 
-        // ========== НОВАЯ ТАБЛИЦА ДЛЯ ВАЛЮТ ==========
+        // ========== ТАБЛИЦА ДЛЯ ВАЛЮТ ==========
         String createCurrencyTable = """
             CREATE TABLE IF NOT EXISTS currencies (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -49,12 +49,27 @@ public class Database {
                 rate DOUBLE NOT NULL
             )
         """;
+        // ========== ТАБЛИЦА ОПЕРАЦИЙ (ИСТОРИЯ ОБМЕНОВ) ==========
+        String createOperationTable = """
+            CREATE TABLE IF NOT EXISTS operations (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                user_login VARCHAR(50) NOT NULL,
+                from_currency VARCHAR(10) NOT NULL,
+                to_currency VARCHAR(10) NOT NULL,
+                amount DOUBLE NOT NULL,
+                result DOUBLE NOT NULL,
+                operation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+            )
+        """;
 
         // try-with-resources — соединение и запрос закроются автоматически
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
             stmt.execute(createUserTable);
             stmt.execute(createCurrencyTable);
+            stmt.execute(createOperationTable);
             System.out.println("[DB] Таблица users создана/проверена");
         } catch (SQLException e) {
             System.err.println("[DB] Ошибка при создании таблицы: " + e.getMessage());
