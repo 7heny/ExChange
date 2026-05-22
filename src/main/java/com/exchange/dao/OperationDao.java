@@ -27,6 +27,7 @@ public class OperationDao {
             pstmt.setString(4, operation.getToCurrency());
             pstmt.setDouble(5, operation.getAmount());
             pstmt.setDouble(6, operation.getResult());
+            pstmt.setDouble(7, operation.getAmountRub());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,6 +53,7 @@ public class OperationDao {
                 op.setToCurrency(rs.getString("to_currency"));
                 op.setAmount(rs.getDouble("amount"));
                 op.setResult(rs.getDouble("result"));
+                op.setAmountRub(rs.getDouble("amount_rub"));
                 op.setOperationDate(rs.getTimestamp("operation_date"));
                 operations.add(op);
             }
